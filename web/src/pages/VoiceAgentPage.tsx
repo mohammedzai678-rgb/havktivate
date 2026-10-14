@@ -3,6 +3,8 @@ import { useVoiceAgent, type RotateMode, type SimKind } from '../hooks/useVoiceA
 import { useSensorWorkflow, type ScanSensor } from '../hooks/useSensorWorkflow';
 import { SensorWorkflowPanel } from '../components/SensorWorkflowPanel';
 import { MedicineReminderPanel } from '../components/MedicineReminderPanel';
+import { WalkingStickPanel } from '../components/WalkingStickPanel';
+import { useStickFeed } from '../hooks/useStickFeed';
 import { METRIC_LABEL, METRIC_UNIT, type MetricKey, type MetricView } from '../lib/anticipation';
 import { voiceHealth, type VoiceHealth } from '../lib/voiceClient';
 
@@ -97,6 +99,9 @@ export default function VoiceAgentPage() {
   const person = caregiver.person.trim() || 'the wearer';
 
   const agent = useVoiceAgent({ language, speechCode, person, caregiver, rotate });
+  const stick = useStickFeed({
+    onSpoken: (ev) => agent.addLog('agent', ev.message, ev.source === 'light' ? 'Walking stick · LDR light' : 'Walking stick · obstacle guidance'),
+  });
   const workflow = useSensorWorkflow({
     metrics: agent.analysis?.metrics ?? null,
     status: agent.feed.status,
@@ -219,6 +224,14 @@ export default function VoiceAgentPage() {
         onBeforeVoiceInput={async () => { if (agent.status !== 'off') await agent.stop(); }}
       />
 
+      <WalkingStickPanel
+        status={stick.status}
+        events={stick.events}
+        engine={stick.engine}
+        voiceEnabled={stick.voiceEnabled}
+        onToggleVoice={(on) => void stick.setVoiceEnabled(on)}
+      />
+
       <SensorWorkflowPanel
         workflow={workflow}
         status={ds}
@@ -293,7 +306,7 @@ export default function VoiceAgentPage() {
             <select value={language} onChange={(e) => setLanguage(e.target.value)} style={{ ...input, marginBottom: 10 }} disabled={running}>
               {LANGUAGES.map((l) => <option key={l.code} value={l.code}>{l.nativeName} ({l.name})</option>)}
             </select>
-            <select onChange={(e) => agent.setOutputDevice(e.target.value)} style={{ ...input, marginBottom: 8 }}>
+            <select onChange={(e) => { agent.setOutputDevice(e.target.value); stick.setOutputDevice(e.target.value); }} style={{ ...input, marginBottom: 8 }}>
               <option value="">Default speaker</option>
               {outputs.filter((d) => d.deviceId !== 'default' && d.deviceId !== 'communications').map((d) => <option key={d.deviceId} value={d.deviceId}>{d.label || 'Audio output'}</option>)}
             </select>

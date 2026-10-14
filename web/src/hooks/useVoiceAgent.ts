@@ -414,7 +414,7 @@ export function useVoiceAgent(opts: VoiceAgentOptions) {
 
   return {
     status, log, analysis, engine, lastTrigger, pendingAlert, sim, sensitivity, feed,
-    start, stop, askNow, testVoice, setOutputDevice, simulate, resetLearning,
+    start, stop, askNow, testVoice, setOutputDevice, simulate, resetLearning, addLog,
     dismissAlert: () => setPendingAlert(null),
   };
 }

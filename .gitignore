@@ -36,3 +36,8 @@ Thumbs.db
 *.tmp
 .vscode/
 .idea/
+
+# KiCad temporary files and generated reports
+hardware/.history/
+hardware/*.lck
+hardware/*.rpt

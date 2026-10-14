@@ -26,6 +26,7 @@ import json
 import os
 import re
 import time
+from collections import deque
 from uuid import uuid4
 from datetime import datetime, timezone
 from pathlib import Path
@@ -777,6 +778,90 @@ async def device_command(body: CommandBody):
     except httpx.HTTPError:
         pass
     return {"ok": True, "command": body.command, "synced_supabase": False}
+
+
+# ----------------------------------------------------------------------------
+# ESP32 #2 - Walking stick (3 x ultrasonic guidance + LDR automatic light)
+# Kept separate from /api/device/* so the watch ESP32 and the stick ESP32
+# never overwrite each other's live data.
+#   POST /api/stick/telemetry  <- ESP32 every 1 s (distances, LDR, LED state)
+#   POST /api/stick/event      <- ESP32 when something must be SPOKEN
+#   GET  /api/stick/status     -> web page (live panel)
+#   GET  /api/stick/events     -> web page polls new events and speaks them
+# ----------------------------------------------------------------------------
+STICK_DEVICE_ID = os.getenv("STICK_DEVICE_ID", "esp32_walking_stick_01")
+_stick_state: dict = {"device_id": STICK_DEVICE_ID, "data": {}, "updated_at": 0}
+_stick_events: deque[dict] = deque(maxlen=200)
+_stick_event_seq = {"id": 0}
+
+
+class StickTelemetryBody(BaseModel):
+    device_id: str = STICK_DEVICE_ID
+    api_key: str | None = None
+    data: dict = Field(default_factory=dict)
+
+
+class StickEventBody(BaseModel):
+    device_id: str = STICK_DEVICE_ID
+    api_key: str | None = None
+    source: Literal["stick", "light"] = "stick"
+    code: str = Field(min_length=1, max_length=40)
+    message: str = Field(min_length=1, max_length=200)
+    priority: int = Field(default=1, ge=1, le=3)
+    data: dict = Field(default_factory=dict)
+
+
+@app.post("/api/stick/telemetry")
+async def stick_telemetry(body: StickTelemetryBody):
+    _stick_state.update({
+        "device_id": body.device_id,
+        "data": body.data,
+        "updated_at": int(time.time() * 1000),
+    })
+    return {"status": "ok", "latest_event_id": _stick_event_seq["id"]}
+
+
+@app.post("/api/stick/event")
+async def stick_event(body: StickEventBody):
+    _stick_event_seq["id"] += 1
+    now_ms = int(time.time() * 1000)
+    event = {
+        "id": _stick_event_seq["id"],
+        "device_id": body.device_id,
+        "source": body.source,
+        "code": body.code,
+        "message": body.message,
+        "priority": body.priority,
+        "data": body.data,
+        "received_at": now_ms,
+    }
+    _stick_events.append(event)
+    # An event also proves the stick is alive.
+    _stick_state.update({"device_id": body.device_id, "updated_at": now_ms})
+    return {"status": "ok", "id": event["id"]}
+
+
+@app.get("/api/stick/status")
+async def stick_status():
+    updated = _stick_state["updated_at"]
+    age_ms = int(time.time() * 1000 - updated) if updated else 0
+    return {
+        "online": bool(updated) and age_ms < 8000,
+        "device_id": _stick_state["device_id"],
+        "data": _stick_state["data"],
+        "updated_at": updated,
+        "age_ms": age_ms,
+        "latest_event_id": _stick_event_seq["id"],
+    }
+
+
+@app.get("/api/stick/events")
+async def stick_events(after: int = Query(-1)):
+    """Events with id > after. after < 0 returns no events, only latest_event_id (no replay on page load)."""
+    latest = _stick_event_seq["id"]
+    if after < 0:
+        return {"events": [], "latest_event_id": latest}
+    return {"events": [e for e in _stick_events if e["id"] > after], "latest_event_id": latest}
 
 
 if __name__ == "__main__":

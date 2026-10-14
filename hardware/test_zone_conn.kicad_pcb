@@ -1,0 +1,46 @@
+(kicad_pcb
+  (version 20260206)
+  (generator "pcbnew")
+  (generator_version "10.0")
+  (general (thickness 1.6) (legacy_teardrops no))
+  (paper "A4")
+  (layers
+    (0 "F.Cu" signal)
+    (31 "B.Cu" signal)
+    (44 "Edge.Cuts" user)
+  )
+  (setup (pad_to_mask_clearance 0))
+  (net 0 "")
+  (net 1 "GND")
+
+  (gr_line (start 5 5) (end 95 5) (stroke (width 0.1) (type solid)) (layer "Edge.Cuts") (uuid "6f3e8d3b-d453-4cfd-8279-c98eab2c4516"))
+  (gr_line (start 95 5) (end 95 85) (stroke (width 0.1) (type solid)) (layer "Edge.Cuts") (uuid "1f093a4c-d3e7-473c-9f54-1f6f97076ed7"))
+  (gr_line (start 95 85) (end 5 85) (stroke (width 0.1) (type solid)) (layer "Edge.Cuts") (uuid "cc7109cd-cc0d-41d9-be0e-a221d3cc1544"))
+  (gr_line (start 5 85) (end 5 5) (stroke (width 0.1) (type solid)) (layer "Edge.Cuts") (uuid "d8680dbe-2865-46de-8bbb-2fb8d4b00f08"))
+
+  (footprint "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"
+    (version 20260206) (layer "F.Cu") (uuid "eb4905df-3d81-4db2-af38-a5a09a2c0563") (at 20 20)
+    (property "Reference" "J1" (at 0 -2 0) (layer "F.SilkS") (uuid "f2ac63bb-0e6d-4f1a-9068-d3b2f30b7524") (effects (font (size 1 1) (thickness 0.15))))
+    (property "Value" "Conn" (at 0 5 0) (layer "F.Fab") (uuid "bbf95e9c-7540-477b-96cf-08e0992648bb") (effects (font (size 1 1) (thickness 0.15))))
+    (property "Footprint" "" (at 0 0 0) (layer "F.Fab") hide (uuid "39bab138-18c5-4ff9-8c6a-69114aff7acb") (effects (font (size 1 1) (thickness 0.15))))
+    (property "Datasheet" "" (at 0 0 0) (layer "F.Fab") hide (uuid "6b8cde3f-9099-40e2-bda5-2d80f430fd82") (effects (font (size 1 1) (thickness 0.15))))
+    (property "Description" "" (at 0 0 0) (layer "F.Fab") hide (uuid "b8be8f51-d2f6-4f3c-891c-225d5b57ae4a") (effects (font (size 1 1) (thickness 0.15))))
+    (pad "1" thru_hole rect (at 0 0) (size 1.7 1.7) (drill 1) (layers "*.Cu" "*.Mask") (remove_unused_layers no) (net 1 "GND") (uuid "6e49f478-0ced-4628-9326-a23e988085c0"))
+    (pad "2" thru_hole circle (at 0 2.54) (size 1.7 1.7) (drill 1) (layers "*.Cu" "*.Mask") (remove_unused_layers no) (net 1 "GND") (uuid "f7405b8a-8089-446c-b8f3-39814b1b1b6f"))
+  )
+
+  (zone
+    (net 1)
+    (net_name "GND")
+    (layers "B.Cu")
+    (uuid "a4a44bbe-afbf-4bc1-92fd-79cead391a10")
+    (hatch edge 0.5)
+    (connect_pads yes (clearance 0.5))
+    (min_thickness 0.25)
+    (filled_areas_thickness no)
+    (fill yes (thermal_gap 0.5) (thermal_bridge_width 0.5))
+    (polygon
+      (pts (xy 5 5) (xy 95 5) (xy 95 85) (xy 5 85))
+    )
+  )
+)
