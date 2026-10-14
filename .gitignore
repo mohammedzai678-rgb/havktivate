@@ -1,0 +1,38 @@
+# Environment & Secret files (CRITICAL: NEVER COMMIT OR PUSH)
+.env
+.env.*
+*.env
+server/.env
+web/.env
+!.env.example
+
+# Dependencies
+node_modules/
+.venv/
+venv/
+env/
+
+# Build outputs & binaries
+dist/
+build/
+*.bin
+*.hex
+*.elf
+*.d
+*.o
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Runtime data & logs
+server/data/*.csv
+*.log
+
+# System files & IDE cache
+.DS_Store
+Thumbs.db
+*.tmp
+.vscode/
+.idea/
