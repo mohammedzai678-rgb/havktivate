@@ -7,12 +7,12 @@
 // =============================================================================
 
 // --- Wi-Fi & Backend Endpoint Configuration ---
-#define WIFI_SSID           "YOUR_WIFI_SSID"
-#define WIFI_PASSWORD       "YOUR_WIFI_PASSWORD"
-#define LOCAL_BACKEND_BASE_URL "http://YOUR_LAPTOP_IP:8001"
+#define WIFI_SSID           "mohammed's M36"
+#define WIFI_PASSWORD       "Zaid3232"
+#define LOCAL_BACKEND_BASE_URL "http://10.236.84.35:8001"
 #define BACKEND_INGEST_URL  LOCAL_BACKEND_BASE_URL "/api/device/ingest"
 #define DEVICE_ID           "esp32_jeevancare_01"
-#define DEVICE_API_KEY      "YOUR_DEVICE_API_KEY"
+#define DEVICE_API_KEY      "jeevan_esp32_prod_2026"
 
 // Telemetry transmit interval (in milliseconds)
 #define TELEMETRY_INTERVAL_MS 2000
